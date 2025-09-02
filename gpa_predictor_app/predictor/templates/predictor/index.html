@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GPA Predictor</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" xintegrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8f9fa;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .card {
+            border: none;
+            border-radius: 1rem;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+        h1.card-title {
+            font-weight: 700;
+            color: #4f46e5;
+            text-align: center;
+        }
+        .form-label {
+            font-weight: 600;
+            font-size: 1rem;
+        }
+        .btn-primary {
+            background-color: #4f46e5;
+            border-color: #4f46e5;
+            font-weight: 700;
+            padding: 12px 24px;
+            box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.3), 0 2px 4px -1px rgba(79, 70, 229, 0.2);
+            transition: background-color 0.3s, transform 0.1s;
+        }
+        .btn-primary:hover {
+            background-color: #4338ca;
+            border-color: #4338ca;
+            transform: translateY(-2px);
+        }
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+        .form-check-input:checked {
+            background-color: #4f46e5;
+            border-color: #4f46e5;
+        }
+        .spinner-border {
+            color: #4f46e5;
+        }
+        .result-box {
+            background-color: #e0e7ff;
+            color: #4f46e5;
+            font-weight: 700;
+            font-size: 1.5rem;
+        }
+        .result-box span {
+            font-size: 2rem;
+            font-weight: 900;
+        }
+        .radio-card {
+            border: 1px solid #ced4da;
+            border-radius: .5rem;
+            padding: .5rem .75rem;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+            text-align: center;
+        }
+        .radio-card:hover {
+            background-color: #e9ecef;
+        }
+        .form-check-input:checked + .radio-card {
+            background-color: #4f46e5;
+            color: white;
+            border-color: #4f46e5;
+        }
+        .form-check-input {
+            opacity: 0;
+            position: absolute;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container my-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 col-md-10">
+                <div class="card p-4">
+                    <div class="card-body">
+                        <h1 class="card-title mb-5">Predict Student GPA</h1>
+                        
+                        <form id="prediction-form" class="row g-4">
+                            <!-- Loading Spinner and Messages -->
+                            <div id="loading-spinner" class="col-12 text-center d-none">
+                                <div class="spinner-border" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                                <p class="mt-2 text-primary">Calculating GPA...</p>
+                            </div>
+                            <!-- Single error message container for all errors -->
+                            <div id="error-message" class="col-12 alert alert-danger d-none" role="alert"></div>
+                            <div id="prediction-result" class="col-12 alert result-box text-center d-none" role="alert"></div>
+                            
+                            <!-- Form Inputs -->
+                            <div class="col-12">
+                                <label for="age" class="form-label">Age:</label>
+                                <input type="number" id="age" name="age" step="1" required class="form-control" placeholder="Enter student's age">
+                            </div>
+                            
+                            <div class="col-12">
+                                <label class="form-label">Gender:</label>
+                                <div class="d-flex gap-3">
+                                    <label class="form-check w-50">
+                                        <input class="form-check-input" type="radio" name="gender" id="genderFemale" value="0" required>
+                                        <div class="radio-card">Female</div>
+                                    </label>
+                                    <label class="form-check w-50">
+                                        <input class="form-check-input" type="radio" name="gender" id="genderMale" value="1" required>
+                                        <div class="radio-card">Male</div>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="col-12">
+                                <label for="parentaleducation" class="form-label">Parental Education (0-4):</label>
+                                <input type="number" id="parentaleducation" name="parentaleducation" step="1" min="0" max="4" required class="form-control" placeholder="Enter parental education level">
+                            </div>
+
+                            <div class="col-12">
+                                <label for="study_time" class="form-label">Weekly Study Time (hours):</label>
+                                <input type="number" id="study_time" name="study_time" step="0.01" required class="form-control" placeholder="Enter hours studied per week">
+                            </div>
+                            
+                            <div class="col-12">
+                                <label for="absences" class="form-label">Absences:</label>
+                                <input type="number" id="absences" name="absences" step="1" required class="form-control" placeholder="Enter total absences">
+                            </div>
+
+                            <div class="col-12">
+                                <label class="form-label">Tutoring:</label>
+                                <div class="d-flex gap-3">
+                                    <label class="form-check w-50">
+                                        <input class="form-check-input" type="radio" name="tutoring" id="tutoringNo" value="0" required>
+                                        <div class="radio-card">No</div>
+                                    </label>
+                                    <label class="form-check w-50">
+                                        <input class="form-check-input" type="radio" name="tutoring" id="tutoringYes" value="1" required>
+                                        <div class="radio-card">Yes</div>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="col-12">
+                                <label for="parental_support" class="form-label">Parental Support (0-4):</label>
+                                <input type="number" id="parental_support" name="parental_support" step="1" min="0" max="4" required class="form-control" placeholder="Enter parental support level">
+                            </div>
+
+                            <div class="col-12">
+                                <label class="form-label">Extracurricular Activities:</label>
+                                <div class="d-flex gap-3">
+                                    <label class="form-check w-50">
+                                        <input class="form-check-input" type="radio" name="extracurricular" id="extracurricularNo" value="0" required>
+                                        <div class="radio-card">No</div>
+                                    </label>
+                                    <label class="form-check w-50">
+                                        <input class="form-check-input" type="radio" name="extracurricular" id="extracurricularYes" value="1" required>
+                                        <div class="radio-card">Yes</div>
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <div class="col-12">
+                                <label class="form-label">Sports:</label>
+                                <div class="d-flex gap-3">
+                                    <label class="form-check w-50">
+                                        <input class="form-check-input" type="radio" name="sports" id="sportsNo" value="0" required>
+                                        <div class="radio-card">No</div>
+                                    </label>
+                                    <label class="form-check w-50">
+                                        <input class="form-check-input" type="radio" name="sports" id="sportsYes" value="1" required>
+                                        <div class="radio-card">Yes</div>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="col-12">
+                                <label class="form-label">Music:</label>
+                                <div class="d-flex gap-3">
+                                    <label class="form-check w-50">
+                                        <input class="form-check-input" type="radio" name="music" id="musicNo" value="0" required>
+                                        <div class="radio-card">No</div>
+                                    </label>
+                                    <label class="form-check w-50">
+                                        <input class="form-check-input" type="radio" name="music" id="musicYes" value="1" required>
+                                        <div class="radio-card">Yes</div>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="col-12">
+                                <label class="form-label">Volunteering:</label>
+                                <div class="d-flex gap-3">
+                                    <label class="form-check w-50">
+                                        <input class="form-check-input" type="radio" name="volunteering" id="volunteeringNo" value="0" required>
+                                        <div class="radio-card">No</div>
+                                    </label>
+                                    <label class="form-check w-50">
+                                        <input class="form-check-input" type="radio" name="volunteering" id="volunteeringYes" value="1" required>
+                                        <div class="radio-card">Yes</div>
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <div class="col-12 d-grid mt-5">
+                                <button type="submit" class="btn btn-primary btn-lg">Predict GPA</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" xintegrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <script>
+        const form = document.getElementById('prediction-form');
+        const errorMessageDiv = document.getElementById('error-message');
+        const resultDiv = document.getElementById('prediction-result');
+        const loadingSpinner = document.getElementById('loading-spinner');
+
+        function predictGPA(data) {
+            const base_gpa = 5.0;
+            const study_time_weight = 0.25;
+            const absences_weight = -0.15;
+            const parental_education_weight = 0.5;
+            const parental_support_weight = 0.3;
+            const tutoring_weight = 0.8;
+            const extracurricular_weight = 0.4;
+            const sports_weight = 0.2;
+            const music_weight = 0.15;
+            const volunteering_weight = 0.1;
+
+            let gpa = base_gpa;
+
+            gpa += parseFloat(data.get('study_time')) * study_time_weight;
+            gpa += parseFloat(data.get('absences')) * absences_weight;
+            gpa += parseFloat(data.get('parentaleducation')) * parental_education_weight;
+            gpa += parseFloat(data.get('parental_support')) * parental_support_weight;
+            gpa += parseFloat(data.get('tutoring')) * tutoring_weight;
+            gpa += parseFloat(data.get('extracurricular')) * extracurricular_weight;
+            gpa += parseFloat(data.get('sports')) * sports_weight;
+            gpa += parseFloat(data.get('music')) * music_weight;
+            gpa += parseFloat(data.get('volunteering')) * volunteering_weight;
+
+            // Clamp GPA between 0.0 and 10.0
+            gpa = Math.max(0.0, Math.min(10.0, gpa));
+            return gpa.toFixed(2);
+        }
+
+        form.addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            // Clear previous messages
+            errorMessageDiv.classList.add('d-none');
+            resultDiv.classList.add('d-none');
+            
+            // Check for required radio button selections
+            const radioGroups = ['gender', 'tutoring', 'extracurricular', 'sports', 'music', 'volunteering'];
+            let isValid = true;
+            let firstInvalidElement = null;
+
+            radioGroups.forEach(groupName => {
+                if (!document.querySelector(`input[name="${groupName}"]:checked`)) {
+                    isValid = false;
+                    if (!firstInvalidElement) {
+                        firstInvalidElement = document.querySelector(`input[name="${groupName}"]`);
+                    }
+                }
+            });
+
+            // If a radio button group is not selected, display an error and scroll to it
+            if (!isValid) {
+                errorMessageDiv.textContent = 'Please select an option for all Yes/No questions.';
+                errorMessageDiv.classList.remove('d-none');
+                if (firstInvalidElement) {
+                    firstInvalidElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+                return;
+            }
+
+            // Perform form validation for other inputs (number fields)
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+
+            // Show loading spinner
+            loadingSpinner.classList.remove('d-none');
+
+            // Use a short delay to simulate "thinking" before displaying the result
+            setTimeout(() => {
+                try {
+                    const formData = new FormData(form);
+                    const predictedGPA = predictGPA(formData);
+                    
+                    // Display the result
+                    resultDiv.innerHTML = `Predicted GPA: <span class="fw-bolder">${predictedGPA}</span>`;
+                    resultDiv.classList.remove('d-none');
+
+                    // Scroll to the result
+                    resultDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                } catch (error) {
+                    console.error('Prediction error:', error);
+                    errorMessageDiv.textContent = 'An error occurred during prediction. Please check your inputs.';
+                    errorMessageDiv.classList.remove('d-none');
+                } finally {
+                    loadingSpinner.classList.add('d-none');
+                }
+            }, 500);
+        });
+    </script>
+</body>
+</html>
