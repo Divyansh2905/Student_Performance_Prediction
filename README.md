@@ -4,19 +4,20 @@
 
 ## 🚀 Live Demo
 
-<div align="center">
-  <a href="https://student-performance-prediction-chkq.onrender.com/">
-    <img src="https://github.com/user-attachments/assets/3af77a17-de12-4e4a-a442-2e1950942257" alt="A screenshot of the live Student GPA Prediction website." width="603" height="909">
+<p align="center">
+  <a href="https://student-performance-prediction-chkq.onrender.com/" target="_blank">
+    <img src="https://github.com/user-attachments/assets/3af77a17-de12-4e4a-a442-2e1950942257" 
+         alt="Preview of the Student GPA Prediction website" 
+         width="600" />
   </a>
-</div>
+</p>
 
-<br>
+<h3 align="center">
+  <a href="https://student-performance-prediction-chkq.onrender.com/" target="_blank">
+    🌎 <b>Visit the Live Site</b> 🚀
+  </a>
+</h3>
 
-<div align="center">
-  <a href="https://student-performance-prediction-chkq.onrender.com/">
-    <h3>🚀 View Live Site 🌎</h3>
-  </a>
-</div>
 
 <br>
 
