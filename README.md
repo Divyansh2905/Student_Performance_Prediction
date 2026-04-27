@@ -74,9 +74,4 @@ Three models were trained and compared:
 
 The application is deployed on **Render** using a `gunicorn` web server. The platform automatically handles the installation of all dependencies from `requirements.txt` and serves the app from a live URL.
 
-## 🔮 Future Improvements
-
-* Add **hyperparameter tuning** for further accuracy.
-* Integrate **SHAP / permutation importance** for explainable predictions.
-* Improve UI/UX of the Django app.
-* Expand the dataset to include more diverse student factors.
+---
