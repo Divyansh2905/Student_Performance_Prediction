@@ -95,7 +95,8 @@
                     <div class="card-body">
                         <h1 class="card-title mb-5">Predict Student GPA</h1>
                         
-                        <form id="prediction-form" class="row g-4">
+                        <form id="prediction-form" method="POST" class="row g-4">
+                            {% csrf_token %}
                             <!-- Loading Spinner and Messages -->
                             <div id="loading-spinner" class="col-12 text-center d-none">
                                 <div class="spinner-border" role="status">
@@ -104,8 +105,16 @@
                                 <p class="mt-2 text-primary">Calculating GPA...</p>
                             </div>
                             <!-- Single error message container for all errors -->
-                            <div id="error-message" class="col-12 alert alert-danger d-none" role="alert"></div>
-                            <div id="prediction-result" class="col-12 alert result-box text-center d-none" role="alert"></div>
+                            {% if error_message %}
+                                <div id="error-message" class="col-12 alert alert-danger" role="alert">
+                                    {{ error_message }}
+                                </div>
+                            {% endif %}
+                            {% if prediction %}
+                                <div id="prediction-result" class="col-12 alert result-box text-center" role="alert">
+                                    Predicted GPA: <span class="fw-bolder">{{ prediction }}</span>
+                                </div>
+                            {% endif %}
                             
                             <!-- Form Inputs -->
                             <div class="col-12">
@@ -133,7 +142,7 @@
                             </div>
 
                             <div class="col-12">
-                                <label for="study_time" class="form-label">Weekly Study Time (hours):</label>
+                                <label for="study_time" class="form-label">Weekly Self-Study Time (hours):</label>
                                 <input type="number" id="study_time" name="study_time" step="0.01" required class="form-control" placeholder="Enter hours studied per week">
                             </div>
                             
@@ -235,96 +244,14 @@
         const resultDiv = document.getElementById('prediction-result');
         const loadingSpinner = document.getElementById('loading-spinner');
 
-        function predictGPA(data) {
-            const base_gpa = 5.0;
-            const study_time_weight = 0.25;
-            const absences_weight = -0.15;
-            const parental_education_weight = 0.5;
-            const parental_support_weight = 0.3;
-            const tutoring_weight = 0.8;
-            const extracurricular_weight = 0.4;
-            const sports_weight = 0.2;
-            const music_weight = 0.15;
-            const volunteering_weight = 0.1;
-
-            let gpa = base_gpa;
-
-            gpa += parseFloat(data.get('study_time')) * study_time_weight;
-            gpa += parseFloat(data.get('absences')) * absences_weight;
-            gpa += parseFloat(data.get('parentaleducation')) * parental_education_weight;
-            gpa += parseFloat(data.get('parental_support')) * parental_support_weight;
-            gpa += parseFloat(data.get('tutoring')) * tutoring_weight;
-            gpa += parseFloat(data.get('extracurricular')) * extracurricular_weight;
-            gpa += parseFloat(data.get('sports')) * sports_weight;
-            gpa += parseFloat(data.get('music')) * music_weight;
-            gpa += parseFloat(data.get('volunteering')) * volunteering_weight;
-
-            // Clamp GPA between 0.0 and 10.0
-            gpa = Math.max(0.0, Math.min(10.0, gpa));
-            return gpa.toFixed(2);
-        }
-
-        form.addEventListener('submit', async (event) => {
-            event.preventDefault();
-
-            // Clear previous messages
-            errorMessageDiv.classList.add('d-none');
-            resultDiv.classList.add('d-none');
-            
-            // Check for required radio button selections
-            const radioGroups = ['gender', 'tutoring', 'extracurricular', 'sports', 'music', 'volunteering'];
-            let isValid = true;
-            let firstInvalidElement = null;
-
-            radioGroups.forEach(groupName => {
-                if (!document.querySelector(`input[name="${groupName}"]:checked`)) {
-                    isValid = false;
-                    if (!firstInvalidElement) {
-                        firstInvalidElement = document.querySelector(`input[name="${groupName}"]`);
-                    }
-                }
-            });
-
-            // If a radio button group is not selected, display an error and scroll to it
-            if (!isValid) {
-                errorMessageDiv.textContent = 'Please select an option for all Yes/No questions.';
-                errorMessageDiv.classList.remove('d-none');
-                if (firstInvalidElement) {
-                    firstInvalidElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                }
-                return;
-            }
-
-            // Perform form validation for other inputs (number fields)
-            if (!form.checkValidity()) {
-                form.reportValidity();
-                return;
-            }
-
+        form.addEventListener('submit', function() {
             // Show loading spinner
             loadingSpinner.classList.remove('d-none');
-
-            // Use a short delay to simulate "thinking" before displaying the result
-            setTimeout(() => {
-                try {
-                    const formData = new FormData(form);
-                    const predictedGPA = predictGPA(formData);
-                    
-                    // Display the result
-                    resultDiv.innerHTML = `Predicted GPA: <span class="fw-bolder">${predictedGPA}</span>`;
-                    resultDiv.classList.remove('d-none');
-
-                    // Scroll to the result
-                    resultDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                } catch (error) {
-                    console.error('Prediction error:', error);
-                    errorMessageDiv.textContent = 'An error occurred during prediction. Please check your inputs.';
-                    errorMessageDiv.classList.remove('d-none');
-                } finally {
-                    loadingSpinner.classList.add('d-none');
-                }
-            }, 500);
+            // Hide previous messages
+            if (errorMessageDiv) errorMessageDiv.classList.add('d-none');
+            if (resultDiv) resultDiv.classList.add('d-none');
         });
+
     </script>
 </body>
 </html>
